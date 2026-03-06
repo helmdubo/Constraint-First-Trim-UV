@@ -114,6 +114,8 @@ def create_debug_visualization(patch_results, source_obj):
     """Создаёт GP strokes для визуализации анализа."""
     gp_obj = _get_or_create_gp_object(source_obj)
     gp_data = gp_obj.data
+    if hasattr(gp_data, 'pixel_factor'):
+        gp_data.pixel_factor = 16.0
 
     frames_and_mats = {}
     for style_name, color in _GP_STYLES.items():

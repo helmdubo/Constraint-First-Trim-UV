@@ -1,8 +1,3 @@
-"""Constraint-First Trim UV (CFTUV) — Blender addon for architectural trim sheet UV mapping.
-
-bl_info, register/unregister, and top-level imports.
-"""
-
 import bpy
 from bpy.props import PointerProperty
 

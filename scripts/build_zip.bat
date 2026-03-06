@@ -1,40 +1,37 @@
 @echo off
-REM ============================================================
-REM  CFTUV Build ZIP — собирает аддон в zip для установки
-REM ============================================================
-
 setlocal enabledelayedexpansion
 
 set "SCRIPT_DIR=%~dp0"
-set "PROJECT_DIR=%SCRIPT_DIR%.."
+for %%I in ("%SCRIPT_DIR%..") do set "PROJECT_DIR=%%~fI"
+set "SOURCE_DIR=%PROJECT_DIR%\cftuv"
 set "OUTPUT=%PROJECT_DIR%\cftuv.zip"
+set "TMP_ROOT=%TEMP%\cftuv_build"
 
-REM --- Удаляем старый zip ---
 if exist "%OUTPUT%" del "%OUTPUT%"
 
-REM --- Собираем zip через PowerShell ---
 powershell -NoProfile -Command ^
-  "Add-Type -Assembly 'System.IO.Compression.FileSystem'; " ^
-  "$src = '%PROJECT_DIR%\cftuv'; " ^
-  "$tmp = Join-Path $env:TEMP 'cftuv_build'; " ^
-  "if (Test-Path $tmp) { Remove-Item $tmp -Recurse -Force }; " ^
-  "Copy-Item $src $tmp -Recurse; " ^
-  "Get-ChildItem $tmp -Recurse -Directory -Filter '__pycache__' | Remove-Item -Recurse -Force; " ^
-  "Get-ChildItem $tmp -Recurse -File -Filter '*.pyc' | Remove-Item -Force; " ^
-  "Compress-Archive -Path $tmp -DestinationPath '%OUTPUT%'; " ^
-  "Remove-Item $tmp -Recurse -Force; " ^
-  "Write-Host '[OK] ZIP создан: %OUTPUT%'"
+  "$src = '%SOURCE_DIR%'; " ^
+  "$tmpRoot = '%TMP_ROOT%'; " ^
+  "if (Test-Path $tmpRoot) { Remove-Item $tmpRoot -Recurse -Force }; " ^
+  "New-Item -ItemType Directory -Path $tmpRoot | Out-Null; " ^
+  "Copy-Item $src $tmpRoot -Recurse; " ^
+  "$tmpAddon = Join-Path $tmpRoot 'cftuv'; " ^
+  "Get-ChildItem $tmpAddon -Recurse -Directory -Filter '__pycache__' | Remove-Item -Recurse -Force; " ^
+  "Get-ChildItem $tmpAddon -Recurse -File -Filter '*.pyc' | Remove-Item -Force; " ^
+  "Compress-Archive -Path $tmpAddon -DestinationPath '%OUTPUT%'; " ^
+  "Remove-Item $tmpRoot -Recurse -Force; " ^
+  "Write-Host '[OK] ZIP created: %OUTPUT%'"
 
 if exist "%OUTPUT%" (
     echo.
     echo ============================================================
-    echo  Готово! Файл: %OUTPUT%
+    echo  Ready: %OUTPUT%
     echo.
-    echo  Установка в Blender:
-    echo    Edit - Preferences - Add-ons - Install - выбрать cftuv.zip
+    echo  Install in Blender:
+    echo    Edit - Preferences - Add-ons - Install - choose cftuv.zip
     echo ============================================================
 ) else (
-    echo [ERROR] Не удалось создать ZIP
+    echo [ERROR] Failed to create ZIP
 )
 
 pause

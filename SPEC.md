@@ -7,7 +7,7 @@
 **Core principle:** Constraints before solve, not post-hoc repair.  
 **Target user:** 3D Environment/Level Artist in video games development.  
 **Target workflow:** Architectural trim sheet UV mapping (tile, trim, decal textures/atlas).  
-**Platform:** Blender addon (4.1+), single Python file currently, planned modular structure.  
+**Platform:** Blender addon (3.0+ runtime target, 4.1 dev baseline), modular Python package under `cftuv/`.  
 **Base:** Evolved from Hotspot UV addon (v2.4.0 → current v2.5.7).
 
 ---
@@ -31,11 +31,11 @@ Determines the physical shape properties of each patch (seam-separated face grou
 - `classify_segment_frame_role()` — H_FRAME/V_FRAME/FREE via local basis projection
 
 **What's missing:**
-- Inner vs outer boundary loop detection for patches with holes (windows, doors)
-  - OUTER boundary segments → frame candidates (pin + straighten)
-  - HOLE boundary segments → always free (never pin)
+- Constraint use of loop kinds in the solver:
+  - OUTER boundary segments -> future frame candidates (pin + straighten)
+  - HOLE boundary segments -> remain free and excluded from frame constraints
 - Curvature analysis (flat / cylindrical / complex)
-- Automatic "straight chain" detection inside patches (not just on boundary)
+- Automatic "straight chain" detection on outer boundaries and inside patches
 
 #### Layer 2 — Semantic Analysis (Topology-Driven)
 Determines relationships between patches based on type and adjacency.
@@ -65,15 +65,16 @@ Assembles constraints from Layers 1-2 and runs solver.
 - Manual Dock operator with fit_vertices + unwrap_interior
 
 **What's missing (critical):**
-- **Frame straighten + pin before solve** — straighten H_FRAME/V_FRAME segments in UV, pin, then conformal. This is the core CFTUV idea.
-- **Seam alignment as constraint, not post-hoc** — align_seam before final unwrap, not after
+- **Frame straighten + pin before the final solve** - straighten OUTER H_FRAME/V_FRAME chains in UV, pin them, then run conformal. HOLE chains stay free.
+- **Initialization strategy for the future solver** - reuse the current preliminary unwrap/orient result as the starting UV state, then apply frame constraints before the final relaxation pass.
+- **Seam alignment as constraint, not post-hoc** - align seam before the final unwrap, not after
 - **Unified constraint solve order:**
   1. Analyze patches (Layer 1)
   2. Classify relations (Layer 2)  
-  3. Extract frame segments, straighten in UV
-  4. Pin frame + seam constraints
-  5. Single conformal solve
-  6. Orient whole islands (rigid transform)
+  3. Run preliminary unwrap/orient to get stable initial UVs
+  4. Extract OUTER frame chains and straighten them in UV
+  5. Pin frame + seam constraints
+  6. Single conformal relaxation pass
   7. Align between islands (dock/stitch)
 
 ---
@@ -112,11 +113,11 @@ Assembles constraints from Layers 1-2 and runs solver.
 | v2.5.0 (attempt 4) | Seam alignment + corrective unwrap | Partial improvement |
 | v2.5.5-6 | Patch analysis + frame classification + debug visualization | Infrastructure for CFTUV approach |
 
-**Current status:** Analysis infrastructure built (patch detection, boundary loops, corner splitting, frame role classification, debug visualization). UV solve pipeline not yet updated to use frame constraints.
+**Current status:** Boundary analysis is integrated into the addon (patch detection, OUTER/HOLE loops, corner splitting, frame role classification), and debug visualization now uses a Grease Pencil Data overlay. The UV solve pipeline still runs the current two-pass unwrap with post-hoc alignment; frame-constrained solve is not implemented yet.
 
 ---
 
-### Current File Structure (single file)
+### Legacy Single-File Origin (historical reference)
 
 ```
 Hotspot_UV_v2_5_6.py
@@ -138,7 +139,7 @@ Hotspot_UV_v2_5_6.py
 │   ├── split_loop_into_segments
 │   ├── classify_segment_frame_role (H_FRAME/V_FRAME/FREE)
 │   └── analyze_all_patches (orchestrator)
-├── DEBUG VISUALIZATION ← NEW (curve objects)
+├── DEBUG VISUALIZATION ← NEW (Grease Pencil overlay)
 │   ├── create_debug_visualization
 │   └── HOTSPOTUV_OT_DebugAnalysis / DebugClear
 ├── HYBRID ALIGNMENT LOGIC
@@ -200,9 +201,8 @@ cftuv/
 
 ### Next Steps (Priority Order)
 
-1. **Fix frame classification** — verify corner detection + segment classification on real meshes with debug visualization
-2. **Implement frame straighten** — for H_FRAME segments: set all verts to same V; for V_FRAME: same U. Positions from world-space projection.
-3. **Implement frame pin + conformal solve** — pin frame verts, run conformal, unpin
-4. **Implement DOCK/STITCH/IGNORE** — replace type!=type skip with proper relation handling
-5. **Split into modules** — move from single file to project structure
-6. **Testing** — create test meshes (cube+bevel, building with windows, L-shape, etc.)
+1. **Validate frame classification on real meshes** - use the Grease Pencil overlay to tune corner detection, OUTER/HOLE classification, and frame-role heuristics
+2. **Extract straight frame chains** - operate on OUTER boundary segments between corners; HOLE loops remain free
+3. **Implement preliminary-unwrap -> straighten/pin -> conformal** - reuse the current unwrap as initialization, then straighten frame chains, pin them, and run the final relaxation pass
+4. **Implement DOCK/STITCH/IGNORE** - replace same-type-only alignment with explicit relation handling, including BEVEL and junction rules
+5. **Testing** - create regression meshes (cube+bevel, building with windows, L-shape, long wall strips) and expected debug/UV outcomes

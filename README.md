@@ -1,6 +1,6 @@
 # Constraint-First Trim UV (CFTUV)
 
-Blender addon (3.0+) for architectural trim sheet UV mapping.
+Blender addon (3.0+ runtime target, 4.1 default dev setup) for architectural trim sheet UV mapping.
 Constraint-first approach: constraints are established BEFORE the final conformal solve, not applied as corrections after.
 
 Evolved from Hotspot UV addon (v2.4.0 -> v2.5.7).
@@ -11,7 +11,7 @@ Evolved from Hotspot UV addon (v2.4.0 -> v2.5.7).
 - **Manual Dock** — dock UV islands based on selected boundary edges
 - **Select Similar** — select all islands with matching 3D area
 - **Stack Similar** — group and perfectly align similar islands with 4-way rotation lock
-- **Debug Visualization** — Grease Pencil overlay for patch/frame analysis
+- **Debug Visualization** — Grease Pencil Data overlay for patch/frame analysis
 
 ## Development Setup (Windows)
 
