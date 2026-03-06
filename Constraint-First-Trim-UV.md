@@ -8,7 +8,7 @@
 **Target user:** 3D Environment/Level Artist in video games development.  
 **Target workflow:** Architectural trim sheet UV mapping (tile, trim, decal textures/atlas).  
 **Platform:** Blender addon (3.0+), single Python file currently, planned modular structure.  
-**Base:** Evolved from Hotspot UV addon (v2.4.0 → current v2.5.6).
+**Base:** Evolved from Hotspot UV addon (v2.4.0 → current v2.5.7).
 
 ---
 
