@@ -25,13 +25,14 @@ Evolved from Hotspot UV addon (v2.4.0 -> v2.5.7).
 > **Important:** Do NOT click the "Install" button in Blender Preferences — that is for ZIP files only.
 > With the symlink approach the addon appears automatically in the addon list after Blender restart.
 > Just search for "Hotspot UV" and enable it.
+> After that you can iterate from the local project folder and only use **Refresh Addon** inside the panel to reload scripts.
 
 Default Blender version is 4.1. For a different version, pass it as argument:
 ```
 scripts\install_dev.bat 4.3
 ```
 
-Changes in code are picked up after **F3 > Reload Scripts** or Blender restart.
+Changes in code are picked up after **F3 > Reload Scripts**, by pressing **Hotspot UV > Development > Refresh Addon**, or by restarting Blender.
 
 ### Build ZIP for Distribution
 
