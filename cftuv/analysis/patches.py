@@ -156,6 +156,74 @@ def classify_boundary_loops_3d(loops, patch_faces):
         return inside
 
     def interior_point(poly):
+        if len(poly) < 3:
+            cx = sum(p[0] for p in poly) / max(len(poly), 1)
+            cy = sum(p[1] for p in poly) / max(len(poly), 1)
+            return (cx, cy)
+
+        area = signed_area(poly)
+        orient = 1.0 if area >= 0.0 else -1.0
+
+        min_x = min(p[0] for p in poly)
+        max_x = max(p[0] for p in poly)
+        min_y = min(p[1] for p in poly)
+        max_y = max(p[1] for p in poly)
+        eps = max(max_x - min_x, max_y - min_y, 1.0) * 1e-4
+
+        for i in range(len(poly)):
+            x1, y1 = poly[i]
+            x2, y2 = poly[(i + 1) % len(poly)]
+            dx = x2 - x1
+            dy = y2 - y1
+            edge_len = (dx * dx + dy * dy) ** 0.5
+            if edge_len < 1e-12:
+                continue
+
+            mid_x = (x1 + x2) * 0.5
+            mid_y = (y1 + y2) * 0.5
+            if orient > 0.0:
+                nx, ny = -dy / edge_len, dx / edge_len
+            else:
+                nx, ny = dy / edge_len, -dx / edge_len
+
+            candidate = (mid_x + nx * eps, mid_y + ny * eps)
+            if point_in_poly(candidate, poly):
+                return candidate
+
+        sample_ys = []
+        cy = sum(p[1] for p in poly) / len(poly)
+        sample_ys.append(cy)
+        sorted_ys = sorted(set(p[1] for p in poly))
+        for i in range(len(sorted_ys) - 1):
+            y_mid = 0.5 * (sorted_ys[i] + sorted_ys[i + 1])
+            if min_y + 1e-9 < y_mid < max_y - 1e-9:
+                sample_ys.append(y_mid)
+
+        best_pt = None
+        best_width = -1.0
+        for y in sample_ys:
+            xs = []
+            for i in range(len(poly)):
+                x1, y1 = poly[i]
+                x2, y2 = poly[(i + 1) % len(poly)]
+                if abs(y2 - y1) < 1e-12:
+                    continue
+                if min(y1, y2) <= y < max(y1, y2):
+                    t = (y - y1) / (y2 - y1)
+                    xs.append(x1 + t * (x2 - x1))
+
+            xs.sort()
+            for i in range(0, len(xs) - 1, 2):
+                width = xs[i + 1] - xs[i]
+                if width > best_width + 1e-12:
+                    candidate = (0.5 * (xs[i] + xs[i + 1]), y)
+                    if point_in_poly(candidate, poly):
+                        best_width = width
+                        best_pt = candidate
+
+        if best_pt is not None:
+            return best_pt
+
         cx = sum(p[0] for p in poly) / len(poly)
         cy = sum(p[1] for p in poly) / len(poly)
         return (cx, cy)
