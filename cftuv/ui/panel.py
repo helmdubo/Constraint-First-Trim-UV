@@ -36,6 +36,11 @@ class HOTSPOTUV_PT_Panel(bpy.types.Panel):
 
         layout.separator()
         col = layout.column(align=True)
+        col.label(text="Development:")
+        col.operator("hotspotuv.refresh_addon", text="Refresh Addon", icon="FILE_REFRESH")
+
+        layout.separator()
+        col = layout.column(align=True)
         col.label(text="Debug:")
         row = col.row(align=True)
         row.operator("hotspotuv.debug_analysis", text="Analyze", icon="VIEWZOOM")

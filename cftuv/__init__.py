@@ -12,6 +12,7 @@ from .operators.manual_dock import HOTSPOTUV_OT_ManualDock
 from .operators.select_similar import HOTSPOTUV_OT_SelectSimilar
 from .operators.stack_similar import HOTSPOTUV_OT_StackSimilar
 from .operators.debug import HOTSPOTUV_OT_DebugAnalysis, HOTSPOTUV_OT_DebugClear, GP_DEBUG_PREFIX
+from .operators.dev import HOTSPOTUV_OT_RefreshAddon
 from .ui.panel import HOTSPOTUV_PT_Panel
 
 bl_info = {
@@ -32,6 +33,7 @@ classes = (
     HOTSPOTUV_OT_StackSimilar,
     HOTSPOTUV_OT_DebugAnalysis,
     HOTSPOTUV_OT_DebugClear,
+    HOTSPOTUV_OT_RefreshAddon,
     HOTSPOTUV_PT_Panel,
 )
 
