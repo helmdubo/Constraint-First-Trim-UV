@@ -4,11 +4,11 @@ import bpy
 import bmesh
 from mathutils import Vector
 
-from cftuv.config import validate_edit_mesh, _apply_settings_to_globals
-from cftuv.analysis.geometry import get_expanded_islands, IslandInfo, analyze_island_properties, build_edge_based_links
-from cftuv.solver.orient import orient_scale_and_position_island, normalize_uvs_to_origin
-from cftuv.solver.align import align_connected_islands
-from cftuv.solver.seam_align import align_split_seams_in_island, align_split_seams_between_islands
+from ..config import validate_edit_mesh, _apply_settings_to_globals
+from ..analysis.geometry import get_expanded_islands, IslandInfo, analyze_island_properties, build_edge_based_links
+from ..solver.orient import orient_scale_and_position_island, normalize_uvs_to_origin
+from ..solver.align import align_connected_islands
+from ..solver.seam_align import align_split_seams_in_island, align_split_seams_between_islands
 
 
 class HOTSPOTUV_OT_UnwrapFaces(bpy.types.Operator):

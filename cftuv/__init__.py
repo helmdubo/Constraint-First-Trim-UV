@@ -6,13 +6,13 @@ bl_info, register/unregister, and top-level imports.
 import bpy
 from bpy.props import PointerProperty
 
-from cftuv.config import HOTSPOTUV_Settings
-from cftuv.operators.unwrap_faces import HOTSPOTUV_OT_UnwrapFaces
-from cftuv.operators.manual_dock import HOTSPOTUV_OT_ManualDock
-from cftuv.operators.select_similar import HOTSPOTUV_OT_SelectSimilar
-from cftuv.operators.stack_similar import HOTSPOTUV_OT_StackSimilar
-from cftuv.operators.debug import HOTSPOTUV_OT_DebugAnalysis, HOTSPOTUV_OT_DebugClear, GP_DEBUG_PREFIX
-from cftuv.ui.panel import HOTSPOTUV_PT_Panel
+from .config import HOTSPOTUV_Settings
+from .operators.unwrap_faces import HOTSPOTUV_OT_UnwrapFaces
+from .operators.manual_dock import HOTSPOTUV_OT_ManualDock
+from .operators.select_similar import HOTSPOTUV_OT_SelectSimilar
+from .operators.stack_similar import HOTSPOTUV_OT_StackSimilar
+from .operators.debug import HOTSPOTUV_OT_DebugAnalysis, HOTSPOTUV_OT_DebugClear, GP_DEBUG_PREFIX
+from .ui.panel import HOTSPOTUV_PT_Panel
 
 bl_info = {
     "name": "Hotspot UV + Mesh Decals (Unified Adaptive)",

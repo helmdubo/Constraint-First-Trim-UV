@@ -7,8 +7,8 @@ for pinning before the conformal solve.
 import math
 from mathutils import Vector
 
-from cftuv.analysis.geometry import IslandInfo, analyze_island_properties, find_island_up, calc_surface_basis
-from cftuv.analysis.patches import find_seam_patches, find_patch_boundary_edges, build_ordered_boundary_loops, classify_boundary_loops_3d
+from .geometry import IslandInfo, analyze_island_properties, find_island_up, calc_surface_basis
+from .patches import find_seam_patches, find_patch_boundary_edges, build_ordered_boundary_loops, classify_boundary_loops_3d
 
 
 def build_patch_basis(patch_faces):

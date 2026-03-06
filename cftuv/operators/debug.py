@@ -8,8 +8,8 @@ import bpy
 import bmesh
 from mathutils import Vector
 
-from cftuv.config import validate_edit_mesh
-from cftuv.analysis.frame import analyze_all_patches
+from ..config import validate_edit_mesh
+from ..analysis.frame import analyze_all_patches
 
 # ============================================================
 # DEBUG VISUALIZATION (Grease Pencil)

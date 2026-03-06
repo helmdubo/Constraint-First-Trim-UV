@@ -6,7 +6,7 @@ and inner/outer boundary classification via 2D projection + nesting depth.
 
 from mathutils import Vector
 
-from cftuv.analysis.geometry import calc_surface_basis
+from .geometry import calc_surface_basis
 
 
 def find_seam_patches(bm, base_faces):

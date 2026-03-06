@@ -3,8 +3,8 @@
 import bpy
 import bmesh
 
-from cftuv.config import validate_edit_mesh
-from cftuv.analysis.geometry import get_expanded_islands, IslandInfo, analyze_island_properties
+from ..config import validate_edit_mesh
+from ..analysis.geometry import get_expanded_islands, IslandInfo, analyze_island_properties
 
 
 class HOTSPOTUV_OT_SelectSimilar(bpy.types.Operator):

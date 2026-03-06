@@ -6,9 +6,9 @@ REM ============================================================
 
 setlocal enabledelayedexpansion
 
-REM --- Версия Blender (по умолчанию 4.2) ---
+REM --- Версия Blender (по умолчанию 4.1) ---
 set "BLENDER_VER=%~1"
-if "%BLENDER_VER%"=="" set "BLENDER_VER=4.2"
+if "%BLENDER_VER%"=="" set "BLENDER_VER=4.1"
 
 REM --- Проверка прав администратора ---
 net session >nul 2>&1

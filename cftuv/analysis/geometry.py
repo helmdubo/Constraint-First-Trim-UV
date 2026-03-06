@@ -6,7 +6,7 @@ Layer 1: Determines physical shape properties of each patch.
 import math
 from mathutils import Vector
 
-from cftuv.config import WORLD_UP
+from ..config import WORLD_UP
 
 
 class IslandInfo:
