@@ -6,8 +6,8 @@ World-space projection via seed face for deterministic, world-aligned UV.
 import math
 from mathutils import Vector
 
-import cftuv.config as config
-from cftuv.analysis.geometry import find_island_up, calc_surface_basis
+from .. import config
+from ..analysis.geometry import find_island_up, calc_surface_basis
 
 
 def orient_scale_and_position_island(uv_layer, island):

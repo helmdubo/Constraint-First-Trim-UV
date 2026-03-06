@@ -22,7 +22,11 @@ Evolved from Hotspot UV addon (v2.4.0 -> v2.5.7).
 3. **Edit > Preferences > Add-ons** -> search "Hotspot UV" -> enable
 4. Panel: **View3D > Sidebar (N) > Hotspot UV**
 
-For a different Blender version, pass it as argument:
+> **Important:** Do NOT click the "Install" button in Blender Preferences — that is for ZIP files only.
+> With the symlink approach the addon appears automatically in the addon list after Blender restart.
+> Just search for "Hotspot UV" and enable it.
+
+Default Blender version is 4.1. For a different version, pass it as argument:
 ```
 scripts\install_dev.bat 4.3
 ```

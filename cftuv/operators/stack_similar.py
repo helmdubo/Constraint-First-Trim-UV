@@ -5,8 +5,8 @@ import bmesh
 import math
 from mathutils import Vector
 
-from cftuv.config import validate_edit_mesh, _apply_settings_to_globals
-from cftuv.analysis.geometry import get_expanded_islands, IslandInfo, analyze_island_properties
+from ..config import validate_edit_mesh, _apply_settings_to_globals
+from ..analysis.geometry import get_expanded_islands, IslandInfo, analyze_island_properties
 
 
 class HOTSPOTUV_OT_StackSimilar(bpy.types.Operator):

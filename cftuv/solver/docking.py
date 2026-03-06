@@ -9,7 +9,7 @@ import bmesh
 import math
 from mathutils import Vector
 
-from cftuv.analysis.geometry import get_expanded_islands, IslandInfo, analyze_island_properties
+from ..analysis.geometry import get_expanded_islands, IslandInfo, analyze_island_properties
 
 
 def compute_best_fit_transform(anchor_uvs_list, target_uvs_list):

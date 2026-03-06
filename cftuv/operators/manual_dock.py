@@ -4,8 +4,8 @@ import bpy
 import bmesh
 from bpy.props import EnumProperty, BoolProperty
 
-from cftuv.config import validate_edit_mesh
-from cftuv.solver.docking import build_island_graph, dock_all_chains
+from ..config import validate_edit_mesh
+from ..solver.docking import build_island_graph, dock_all_chains
 
 
 class HOTSPOTUV_OT_ManualDock(bpy.types.Operator):
