@@ -13,50 +13,20 @@ from .patches import find_seam_patches, find_patch_boundary_edges, build_ordered
 
 
 def _build_single_face_basis(face, avg_normal):
-    """Stabilize basis for 1-face wall/reveal patches using face edges + WORLD_UP."""
-    plane_normal = face.normal.normalized() if face.normal.length_squared > 1e-12 else avg_normal.normalized()
+    """Build a stable 1-face basis from the face normal and projected WORLD_UP."""
+    if face.normal.length_squared > 1e-12:
+        plane_normal = face.normal.normalized()
+    elif avg_normal.length_squared > 1e-12:
+        plane_normal = avg_normal.normalized()
+    else:
+        plane_normal = Vector((0.0, 0.0, 1.0))
 
-    vertical_edge = None
-    vertical_score = -1.0
-    longest_edge = None
-    longest_len = -1.0
-
-    for edge in face.edges:
-        edge_vec = edge.verts[1].co - edge.verts[0].co
-        edge_len = edge_vec.length
-        if edge_len < 1e-8:
-            continue
-
-        edge_dir = edge_vec / edge_len
-        if edge_dir.dot(WORLD_UP) < 0.0:
-            edge_dir = -edge_dir
-
-        vertical_alignment = abs(edge_dir.dot(WORLD_UP))
-        vertical_candidate_score = edge_len * (vertical_alignment ** 2)
-        if vertical_candidate_score > vertical_score:
-            vertical_score = vertical_candidate_score
-            vertical_edge = edge_dir
-
-        if edge_len > longest_len:
-            longest_len = edge_len
-            longest_edge = edge_dir
-
-    if vertical_edge is not None and abs(vertical_edge.dot(WORLD_UP)) > 0.25:
-        seed_b = vertical_edge
+    local_up = WORLD_UP - plane_normal * WORLD_UP.dot(plane_normal)
+    if local_up.length_squared > 1e-8:
+        seed_b = local_up.normalized()
         seed_t = seed_b.cross(plane_normal)
         if seed_t.length_squared > 1e-8:
-            return seed_t.normalized(), seed_b.normalized()
-
-    if longest_edge is not None:
-        seed_t = longest_edge - plane_normal * longest_edge.dot(plane_normal)
-        if seed_t.length_squared > 1e-8:
-            seed_t.normalize()
-            seed_b = plane_normal.cross(seed_t)
-            if seed_b.length_squared > 1e-8:
-                if seed_b.dot(WORLD_UP) < 0.0:
-                    seed_b = -seed_b
-                    seed_t = -seed_t
-                return seed_t, seed_b.normalized()
+            return seed_t.normalized(), seed_b
 
     return calc_surface_basis(plane_normal, WORLD_UP)
 
@@ -165,33 +135,48 @@ def split_loop_into_segments(loop_verts, corners):
     return segments
 
 
-def classify_segment_frame_role(segment_verts, seed_t, seed_b, threshold=0.08):
-    """
-    Определяет роль СЕГМЕНТА boundary loop для frame.
+def _classify_single_face_segment_role(segment_verts, face_normal, angle_limit_deg=25.0):
+    """Classify a 1-face patch edge against face-local up/side axes.
 
-    H_FRAME = горизонтальная линия в 3D (low V variance)
-    V_FRAME = вертикальная линия в 3D (low U variance)
-    FREE = диагональная или слишком короткая
+    This is intentionally strict so near-diagonal edges stay FREE.
     """
     if len(segment_verts) < 2:
         return 'FREE'
 
-    if len(segment_verts) == 2:
-        edge_vec = segment_verts[1].co - segment_verts[0].co
-        if edge_vec.length < 1e-8:
-            return 'FREE'
+    edge_vec = segment_verts[-1].co - segment_verts[0].co
+    if edge_vec.length < 1e-8:
+        return 'FREE'
 
-        edge_dir = edge_vec.normalized()
-        align_u = abs(edge_dir.dot(seed_t))
-        align_v = abs(edge_dir.dot(seed_b))
+    if face_normal.length_squared < 1e-12:
+        return None
+    plane_normal = face_normal.normalized()
 
-        if max(align_u, align_v) < 0.6:
-            return 'FREE'
-        if abs(align_u - align_v) < 0.1:
-            return 'FREE'
-        if align_u > align_v:
-            return 'H_FRAME'
+    local_v = WORLD_UP - plane_normal * WORLD_UP.dot(plane_normal)
+    if local_v.length_squared < 1e-8:
+        return None
+    local_v.normalize()
+
+    local_h = local_v.cross(plane_normal)
+    if local_h.length_squared < 1e-8:
+        return None
+    local_h.normalize()
+
+    edge_dir = edge_vec.normalized()
+    align_h = abs(edge_dir.dot(local_h))
+    align_v = abs(edge_dir.dot(local_v))
+    cos_limit = math.cos(math.radians(angle_limit_deg))
+
+    if align_h >= cos_limit and align_h > align_v:
+        return 'H_FRAME'
+    if align_v >= cos_limit and align_v > align_h:
         return 'V_FRAME'
+    return 'FREE'
+
+
+def classify_segment_frame_role(segment_verts, seed_t, seed_b, threshold=0.08):
+    """Classify a boundary segment as H_FRAME, V_FRAME, or FREE."""
+    if len(segment_verts) < 2:
+        return 'FREE'
 
     us = [v.co.dot(seed_t) for v in segment_verts]
     vs = [v.co.dot(seed_b) for v in segment_verts]
@@ -235,7 +220,11 @@ def analyze_all_patches(bm, base_faces):
 
             lp_segments = []
             for seg_verts in segments:
-                role = classify_segment_frame_role(seg_verts, seed_t, seed_b)
+                role = None
+                if len(patch_faces) == 1:
+                    role = _classify_single_face_segment_role(seg_verts, patch_faces[0].normal)
+                if role is None:
+                    role = classify_segment_frame_role(seg_verts, seed_t, seed_b)
                 lp_segments.append({
                     'vert_cos': [v.co.copy() for v in seg_verts],
                     'frame_role': role,
